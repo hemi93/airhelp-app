@@ -4,6 +4,7 @@ require './csv_loader.rb'
 require './exceptions.rb'
 require './flights_data_processor.rb'
 require './output_csv_builder.rb'
+require './errors_csv_builder.rb'
 require 'fileutils'
 
 class Main
@@ -21,8 +22,10 @@ class Main
     fetch_user_options
     if output_file_access?
       csv_data = CsvLoader.new(@input_file_path).load_data
-      output_data = FlightsDataProcessor.new(csv_data).process
+      processor = FlightsDataProcessor.new(csv_data)
+      output_data = processor.process
       OutputCsvBuilder.new(output_data, @output_file_path).build_and_save_csv
+      ErrorsCsvBuilder.new(processor.errors_rows).build_and_save_csv if processor.data_container_errors?
       puts "Success. Data saved to: #{@output_file_path}"
     else
       puts 'Cancelled!'
@@ -36,8 +39,6 @@ class Main
     puts 'Provided input CSV file is malformed. Aborting!'
     abort
   end
-
-  private
 
   def output_file_access?
     if File.exist?(@output_file_path)

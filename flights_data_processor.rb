@@ -3,10 +3,12 @@ require './carrier_code_parser.rb'
 require './flight_data_record.rb'
 
 class FlightsDataProcessor
+  attr_reader :errors_rows
+
   def initialize(input_data)
     @input_data = input_data
     @output_records = []
-    @errors_data = []
+    @errors_rows = []
   end
 
   def process
@@ -15,12 +17,16 @@ class FlightsDataProcessor
       begin
         flight_data_record = output_row(row)
       rescue UnknownCarrierCodeType, InvalidParsedDateError, MissingRequiredAttributeValueErrror => error
-        @errors_data << error_row(row, error)
+        @errors_rows << error_row(row, error)
       else
         @output_records << flight_data_record
       end
     end
     @output_records
+  end
+
+  def data_container_errors?
+    @errors_rows.any?
   end
 
   private
@@ -40,7 +46,7 @@ class FlightsDataProcessor
 
   def parse_flight_date(date_string)
     Date.parse(date_string, '%Y-%m-%d')
-  rescue ArgumentError => e
+  rescue ArgumentError
     raise InvalidParsedDateError, date_string
   end
 

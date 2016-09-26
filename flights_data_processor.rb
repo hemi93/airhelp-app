@@ -1,5 +1,5 @@
 require './exceptions.rb'
-require './carrier_code_parser.rb'
+require './carrier_code_classifier.rb'
 require './flight_data_record.rb'
 
 class FlightsDataProcessor
@@ -34,7 +34,7 @@ class FlightsDataProcessor
   def output_row(row)
     id, carrier_code, flight_number, flight_date_text = row
     validate_row(row)
-    carrier_code_type = CarrierCodeParser.carrier_code_type(carrier_code)
+    carrier_code_type = CarrierCodeClassifier.classify_carrier_code(carrier_code)
     date = parse_flight_date(flight_date_text)
     FlightDataRecord.new(id, carrier_code, carrier_code_type, flight_number, date)
   end

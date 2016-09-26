@@ -1,6 +1,6 @@
 # Recruitment test app for AirHelp
 
-#### Requirements
+#### Usage
   Show help
 
   `$ main.rb -h`

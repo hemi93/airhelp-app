@@ -25,6 +25,8 @@ class OutputCsvBuilder
 
   def ensure_save_path_is_valid
     path = @save_path.split('/')
+    path_is_nested = path.length > 1
+    return unless path_is_nested
     path = path[0..path.length - 2].join('/')
     FileUtils.mkdir_p(path) unless File.exist?(path)
   end

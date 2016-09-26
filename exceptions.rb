@@ -38,3 +38,6 @@ class InvalidParsedDateError < StandardError
     "#{@date_string} is not a valid parsable date"
   end
 end
+
+class InvalidFilename < StandardError
+end

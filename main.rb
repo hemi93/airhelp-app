@@ -16,6 +16,7 @@ class Main
 
   def fetch_user_options
     @input_file_path, @output_file_path = CmdLineOptionParser.new.user_provided_options
+    raise InvalidFilename if @input_file_path.empty? || @output_file_path.empty?
   end
 
   def run
@@ -34,6 +35,9 @@ class Main
     puts 'Interrupted'
   rescue FileNotFoundException
     puts 'Input file was not found under specified path. Aborting!'
+    abort
+  rescue InvalidFilename
+    puts 'Provided invalid filename. Aborting!'
     abort
   rescue InvalidCSVFileError
     puts 'Provided input CSV file is malformed. Aborting!'

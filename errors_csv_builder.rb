@@ -1,8 +1,7 @@
 require 'csv'
-require 'fileutils'
 
 class ErrorsCsvBuilder
-  ATRRIBUTE_NAMES = %w(id carrier_code flight_number date).freeze
+  ATRRIBUTE_NAMES = %w(id carrier_code flight_number date error_reason).freeze
 
   def initialize(data)
     @data = data

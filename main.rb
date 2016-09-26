@@ -4,6 +4,7 @@ require './csv_loader.rb'
 require './exceptions.rb'
 require './flights_data_processor.rb'
 require './output_csv_builder.rb'
+require 'fileutils'
 
 class Main
   def initialize
@@ -12,11 +13,20 @@ class Main
 
   private
 
+  def fetch_user_options
+    @input_file_path, @output_file_path = CmdLineOptionParser.new.user_provided_options
+  end
+
   def run
-    input_file_path, output_file_path = CmdLineOptionParser.new.user_provided_options
-    csv_data = CsvLoader.new(input_file_path).load_data
-    output_data = FlightsDataProcessor.new(csv_data).process
-    output_csv = OutputCsvBuilder.new(output_data, output_file_path).build_csv
+    fetch_user_options
+    if output_file_access?
+      csv_data = CsvLoader.new(@input_file_path).load_data
+      output_data = FlightsDataProcessor.new(csv_data).process
+      OutputCsvBuilder.new(output_data, @output_file_path).build_and_save_csv
+      puts "Success. Data saved to: #{@output_file_path}"
+    else
+      puts 'Cancelled!'
+    end
   rescue Interrupt
     puts 'Interrupted'
   rescue FileNotFoundException
@@ -25,8 +35,23 @@ class Main
   rescue InvalidCSVFileError
     puts 'Provided input CSV file is malformed. Aborting!'
     abort
-  else
-    puts 'Success'
+  end
+
+  private
+
+  def output_file_access?
+    if File.exist?(@output_file_path)
+      puts 'Output file already exists. Overwrite? (y/n)'
+      decision = nil
+      while decision.nil?
+        decision_text = gets.chomp
+        decision = true if decision_text == 'y'
+        decision = false if decision_text == 'n'
+      end
+      decision
+    else
+      true
+    end
   end
 end
 

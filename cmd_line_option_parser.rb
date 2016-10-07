@@ -59,7 +59,10 @@ class CmdLineOptionParser
   end
 
   def fail_if_invalid_params
-    params_invalid = @options[:input_file_path].empty? || @options[:output_file_path].empty?
-    raise UserProvidedInvalidFilenameError if params_invalid
+    raise UserProvidedInvalidFilenameError if params_invalid?
+  end
+
+  def params_invalid?
+    @options[:input_file_path].empty? || @options[:output_file_path].empty?
   end
 end

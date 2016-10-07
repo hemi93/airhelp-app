@@ -12,7 +12,7 @@ class InvalidCSVFileError < StandardError
   end
 end
 
-# Thrown when application found invalid or unsupported carrier code in input data
+# Thrown when application found unsupported carrier code in input data
 class UnknownCarrierCodeType < StandardError
   def initialize(code)
     @code = code

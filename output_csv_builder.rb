@@ -2,7 +2,7 @@ require 'csv'
 
 # Responsible for creating and saving CSV file with application output
 class OutputCsvBuilder
-  ATRRIBUTE_NAMES = %w(id carrier_code_type carrier_code flight_number date).freeze
+  FILE_HEADER = %w(id carrier_code_type carrier_code flight_number date).freeze
 
   def initialize(data, save_path)
     @data = data
@@ -27,11 +27,19 @@ class OutputCsvBuilder
 
   def construct_and_save_csv
     CSV.open(@save_path, 'w') do |csv|
-      csv << ATRRIBUTE_NAMES
-      @data.each do |flight_data|
-        csv << ATRRIBUTE_NAMES.map do |attr_name|
-          flight_data.send(attr_name.to_sym)
-        end
+      push_header(csv)
+      push_data(csv)
+    end
+  end
+
+  def push_header(csv)
+    csv << FILE_HEADER
+  end
+
+  def push_data(csv)
+    @data.each do |flight_data|
+      csv << FILE_HEADER.map do |attr_name|
+        flight_data.send(attr_name.to_sym)
       end
     end
   end

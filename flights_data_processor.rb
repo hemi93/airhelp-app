@@ -1,6 +1,7 @@
 require './exceptions.rb'
 require './carrier_code_classifier.rb'
 require './flight_data_record.rb'
+require './error_row.rb'
 
 # Responsible for creating raw output data with classified carrier codes
 class FlightsDataProcessor
@@ -12,7 +13,7 @@ class FlightsDataProcessor
     @errors_rows = []
   end
 
-  def process
+  def output
     @input_data.each_with_index do |row, index|
       next if index.zero?
       process_row(row)
@@ -30,7 +31,7 @@ class FlightsDataProcessor
     flight_data_record = output_row(row)
   rescue UnknownCarrierCodeType, InvalidParsedDateError,
          MissingRequiredAttributeValueErrror => error
-    @errors_rows << error_row(row, error)
+    @errors_rows << ErrorRow.new(row, error).row
   else
     @output_records << flight_data_record
   end
@@ -38,14 +39,9 @@ class FlightsDataProcessor
   def output_row(row)
     id, carrier_code, flight_number, flight_date_text = row
     validate_row(row)
-    carrier_code_type = CarrierCodeClassifier.classify_carrier_code(carrier_code)
+    code_type = CarrierCodeClassifier.classify(carrier_code)
     date = parse_flight_date(flight_date_text)
-    FlightDataRecord.new(id, carrier_code, carrier_code_type, flight_number, date)
-  end
-
-  def error_row(row, error)
-    id, carrier_code, flight_number, flight_date_text = row
-    [id, carrier_code, flight_number, flight_date_text, error.message]
+    FlightDataRecord.new(id, carrier_code, code_type, flight_number, date)
   end
 
   def parse_flight_date(date_string)

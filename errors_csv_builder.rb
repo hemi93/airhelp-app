@@ -1,8 +1,9 @@
 require 'csv'
 
-# Responsible for building and saving CSV file with flights data processing errors
+# Responsible for saving CSV file with processing errors
 class ErrorsCsvBuilder
-  ATRRIBUTE_NAMES = %w(id carrier_code flight_number date error_reason).freeze
+  OUTPUT_FILE_PATH = 'error.csv'.freeze
+  FILE_HEADER = %w(id carrier_code flight_number date error_reason).freeze
 
   def initialize(data)
     @data = data
@@ -10,11 +11,21 @@ class ErrorsCsvBuilder
   end
 
   def save_csv
-    CSV.open('error.csv', 'w') do |csv|
-      csv << ATRRIBUTE_NAMES
-      @data.each do |error_row|
-        csv << error_row
-      end
+    CSV.open(OUTPUT_FILE_PATH, 'w') do |csv|
+      push_header(csv)
+      push_data(csv)
+    end
+  end
+
+  private
+
+  def push_header(csv)
+    csv << FILE_HEADER
+  end
+
+  def push_data(csv)
+    @data.each do |error_row|
+      csv << error_row
     end
   end
 end

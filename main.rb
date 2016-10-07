@@ -17,37 +17,47 @@ class Main
   private
 
   def run
-    fetch_user_options
-    if OutputFileAccessValidator.new(@output_file_path).access_granted?
-      perform
-    else
-      puts 'Cancelled!'
-      abort
-    end
+    execute
   rescue Interrupt
-    puts 'Interrupted'
+    abort_with_msg 'Interrupted'
   rescue FileNotFoundException
-    puts 'Input file was not found under specified path. Aborting!'
-    abort
+    abort_with_msg 'Input file was not found under specified path. Aborting!'
   rescue UserProvidedInvalidFilenameError
-    puts 'Provided invalid filename. Aborting!'
-    abort
+    abort_with_msg 'Provided invalid filename. Aborting!'
   rescue InvalidCSVFileError
-    puts 'Provided input CSV file is malformed. Aborting!'
-    abort
+    abort_with_msg 'Provided input CSV file is malformed. Aborting!'
   end
 
   def fetch_user_options
     @input_file_path, @output_file_path = CmdLineOptionParser.new.options
   end
 
-  def perform
+  def execute
+    fetch_user_options
+    if OutputFileAccessValidator.new(@output_file_path).access_granted?
+      perform_data_processing
+    else
+      puts 'Cancelled!'
+      abort
+    end
+  end
+
+  def perform_data_processing
     csv_data = CsvLoader.new(@input_file_path).load_data
     processor = FlightsDataProcessor.new(csv_data)
-    output_data = processor.process
-    OutputCsvBuilder.new(output_data, @output_file_path).save_csv
-    ErrorsCsvBuilder.new(processor.errors_rows).save_csv if processor.errors?
+    output_data = processor.output
+    save_results(output_data, processor.errors_rows)
     puts "Success. Data saved to: #{@output_file_path}"
+  end
+
+  def save_results(output_data, errors_data = nil)
+    OutputCsvBuilder.new(output_data, @output_file_path).save_csv
+    ErrorsCsvBuilder.new(errors_data).save_csv if errors_data
+  end
+
+  def abort_with_msg(message)
+    puts message
+    abort
   end
 end
 

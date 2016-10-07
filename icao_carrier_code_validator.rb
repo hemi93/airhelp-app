@@ -1,3 +1,4 @@
+# Responsible for validating ICAO carrier code
 class IcaoCarrierCodeValidator
   VALID_CODE_REGEXP = /(^[A-Z]{3}$)/
 

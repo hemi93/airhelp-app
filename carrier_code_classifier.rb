@@ -1,6 +1,7 @@
 require './iata_carrier_code_validator.rb'
 require './icao_carrier_code_validator.rb'
 
+# Responsible for classifying carrier codes
 class CarrierCodeClassifier
   def self.classify_carrier_code(code)
     if IataCarrierCodeValidator.valid?(code)

@@ -2,6 +2,7 @@ require './exceptions.rb'
 require './carrier_code_classifier.rb'
 require './flight_data_record.rb'
 
+# Responsible for creating raw output data with classified carrier codes
 class FlightsDataProcessor
   attr_reader :errors_rows
 
@@ -14,22 +15,25 @@ class FlightsDataProcessor
   def process
     @input_data.each_with_index do |row, index|
       next if index.zero?
-      begin
-        flight_data_record = output_row(row)
-      rescue UnknownCarrierCodeType, InvalidParsedDateError, MissingRequiredAttributeValueErrror => error
-        @errors_rows << error_row(row, error)
-      else
-        @output_records << flight_data_record
-      end
+      process_row(row)
     end
     @output_records
   end
 
-  def data_container_errors?
+  def errors?
     @errors_rows.any?
   end
 
   private
+
+  def process_row(row)
+    flight_data_record = output_row(row)
+  rescue UnknownCarrierCodeType, InvalidParsedDateError,
+         MissingRequiredAttributeValueErrror => error
+    @errors_rows << error_row(row, error)
+  else
+    @output_records << flight_data_record
+  end
 
   def output_row(row)
     id, carrier_code, flight_number, flight_date_text = row

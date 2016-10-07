@@ -1,3 +1,4 @@
+# Responsible for storing data about single flight information
 class FlightDataRecord
   attr_reader :id, :carrier_code, :carrier_code_type, :flight_number, :date
 

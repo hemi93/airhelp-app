@@ -2,6 +2,7 @@ require 'fileutils'
 require 'csv'
 require './exceptions.rb'
 
+# Responsible for opening and loading CSV files
 class CsvLoader
   def initialize(input_file_path)
     @input_file_path = input_file_path
